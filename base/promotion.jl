@@ -93,7 +93,7 @@ function typejoin(@nospecialize(a), @nospecialize(b))
             p = Vector{Any}(undef, n)
             for i = 1:n
                 ai, bi = a.parameters[i], b.parameters[i]
-                if ai === bi || (isa(ai,Type) && isa(bi,Type) && typeseq(ai,bi))
+                if ai === bi || (isa(ai,Type) && isa(bi,Type) && ai == bi)
                     p[i] = ai
                 else
                     p[i] = aprimary.parameters[i]
