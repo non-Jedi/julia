@@ -79,6 +79,45 @@ mktempdir() do dir
     end
 end
 
+## unit tests of project & manifest parsing ##
+
+# with/without root name
+root_name = ["", "name = \"Root\"\n"]
+root_uuid = ["", "uuid = \"43306aae-ef21-43f3-9517-81724f2885ac\"\n"]
+other_key = ["", key = 123.456\n"]
+
+
+
+
+# with/without root uuid (defaults to dummy)
+# with/without other key
+# different orders of the above
+
+# no deps/empty deps/non-empty deps
+# no section/empty section/non-empty section
+# different orders of the above
+
+@testset "explicit_project_deps_get" begin
+    mktemp() do project_file, io
+        tests = Any[
+            false "Foo" "" # empty project file
+            false "Foo" """
+            name = "Bar"
+            """
+            false "Foo" """
+            name = "Bar"
+            [deps]
+            """
+            false "Foo" """
+            name = "Bar"
+            [other]
+            """
+        ]
+    end
+end
+
+## functional testing of package identification, location & loading ##
+
 import Base: SHA1, PkgId, load_path, identify_package, locate_package, version_slug, dummy_uuid
 import UUIDs: UUID, uuid4, uuid_version
 import Random: shuffle, randstring
@@ -415,14 +454,14 @@ function test_find(
     end
 end
 
-@testset "identify_package with one env in load path" begin
+@testset "find_package with one env in load path" begin
     for (env, (_, _, roots, graph, paths)) in envs
         push!(empty!(LOAD_PATH), env)
         test_find(roots, graph, paths)
     end
 end
 
-@testset "identify_package with two envs in load path" begin
+@testset "find_package with two envs in load path" begin
     for x = false:true,
         (env1, (_, _, roots1, graph1, paths1)) in (x ? envs : rand(envs, 10)),
         (env2, (_, _, roots2, graph2, paths2)) in (x ? rand(envs, 10) : envs)
@@ -434,7 +473,7 @@ end
     end
 end
 
-@testset "identify_package with three envs in load path" begin
+@testset "find_package with three envs in load path" begin
     for (env1, (_, _, roots1, graph1, paths1)) in rand(envs, 10),
         (env2, (_, _, roots2, graph2, paths2)) in rand(envs, 10),
         (env3, (_, _, roots3, graph3, paths3)) in rand(envs, 10)
